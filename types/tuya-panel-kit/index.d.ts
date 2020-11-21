@@ -395,8 +395,8 @@ export interface GlobalToastProps extends ToastProps, IconFontProps {
     showIcon?: boolean;
 }
 export class GlobalToast {
-    show: (option: GlobalToastProps) => void;
-    hide: () => void;
+    static show: (option: Omit<GlobalToastProps, 'show'>) => void;
+    static hide: () => void;
 }
 
 // LinearGradient
@@ -2085,31 +2085,79 @@ export let TYSdk: {
     devInfo: DevInfo;
 
     device: {
+        /**
+         * @desc 检查 dp 是否存在
+         */
         checkDpExist(idOrCode: number | string): boolean;
+        /**
+         * @desc 删除设备
+         */
         deleteDeviceInfo(): Promise<void>;
         formatDps(data: Record<number, any>): Record<string, any>;
+        /**
+         * @desc 获取蓝牙状态
+         */
         getBleManagerState(): Promise<boolean>;
+        /**
+         * @desc 获取设备蓝牙权限状态，IOS13新增
+         * @deprecated
+         */
         getBluetoothState(): Promise<number>;
+        /**
+         * @desc 获取当前最新的设备信息，见 TYSdk.devInfo
+         */
         getDeviceInfo(): Promise<DevInfo>;
         // tslint:disable-next-line no-unnecessary-generics
         getDeviceState<S = Record<string, DpType>>(): Promise<S>;
+        /**
+         * @desc 根据 dpId 获取 dpCode
+         */
         getDpCodeById(id: string | number): string;
+        /**
+         * @desc 获取所有 codes
+         */
         getDpCodes(): string[];
         /**
          * @desc 主动从设备获取 dp 点状态
          */
         getDpDataFromDevice(idOrCode: string | number): Promise<void>;
+        /**
+         * @desc 根据 dpCode 获取 dpId
+         */
         getDpIdByCode(code: string): string;
+        /**
+         * @desc 获取全部 dp schema
+         */
         getDpSchema(): DpSchema[];
+        /**
+         * 
+         * @desc 根据 code 获取 dp 点的 unit、range、min 等 schema 信息
+         */
         getDpSchema(code: string): DpSchema;
+        /**
+         * @desc 获取设备功能点配置
+         */
         getFunConfig(): Record<string, any>;
         /**
          * @deprecated
          */
         getGState(dp: string): any;
+        /**
+         * 
+         * @desc 获取 dp 的 value 值，如果不传参数则获取全部 dp value
+         */
         getState(dp?: string): any;
+        /**
+         * @desc 获取拆包面板信息
+         */
         getUnpackPanelInfo(): Promise<I18NLanMap>;
+        /**
+         * @desc Android 申请蓝牙权限
+         */
         gotoBlePermissions(): void;
+        /**
+         * @desc wifi网络状态监测
+         */
         gotoDeviceWifiNetworkMonitor(): void;
         initDevice(): Promise<DevInfo>;
         isBleDevice(): boolean;
@@ -2120,7 +2168,7 @@ export let TYSdk: {
         isSigMeshDevice(): boolean;
         isWifiDevice(): boolean;
         /**
-         * @desc 下发 dp 点
+         * @desc 下发 dp 点(与硬件端交互核心方法)，局域网也支持
          */
         putDeviceData(cmd: Record<string, any>): Promise<{ success: boolean }>;
         /**
@@ -2175,40 +2223,79 @@ export let TYSdk: {
          * @desc 蓝牙状态变更通知
          */
         on(event: 'bluetoothChange', callback: (value: boolean) => void): void;
+        /**
+         * @desc NavigatorLayout 路由即将渲染
+         */
+        on(event: 'NAVIGATOR_ON_WILL_FOCUS', callback: (route: DeprecatedNavigatorRoute) => void): void;
+        /**
+         * @desc NavigatorLayout 路由完成渲染
+         */
+        on(event: 'NAVIGATOR_ON_DID_FOCUS', callback: (route: DeprecatedNavigatorRoute) => void): void;
         once(event: string, callback: AnyFunction): void;
         remove(event: string, callback: AnyFunction): void;
     };
 
     mobile: {
         /**
-         * 返回到 app 列表页面
+         * @desc 从面板容器内跳出返回 app 列表
          */
         back(): void;
+        /**
+         * @desc 显示底部对话列表
+         * @param {Array} itemList - 列表
+         * @param {Number} selected - 选中列表的索引
+         * @param {Function} onConfirmed - 确认函数
+         */
         bottomListDialog(itemList: any, selected: any, onConfirmed: any): void;
+        /**
+         * @desc ios 禁用手势全屏返回
+         */
         disablePopGesture(): void;
+        /**
+         * @desc ios 开启手势全屏返回
+         */
         enablePopGesture(): void;
+        /**
+         * @desc 获取客户端信息，如 app 的版本信息，时区等
+         */
         getMobileInfo(): Promise<MobileInfo>;
+        /**
+        * @desc 获取网络状态
+        * @returns {Strings} 'WIFI' | 'GPRS' | 'BLE' | 'NONE'
+        */
         getNetworkState(): NetworkType;
         /**
          * @platform IOS only
          */
         getWiFiSsid(): string;
         /**
-         * 隐藏 app 原生 loading UI 框
+         * @desc 隐藏 app 原生 loading UI 框
          */
         hideLoading(): void;
         is24Hour(): boolean;
         /**
          * @desc 根据 uiId 跳转二级页面
+         * @param {Object} { uiId } 二级页面项目uiId
+         * @param {Object} pageParams 传递的属性
          */
         jumpSubPage(uiIdParams: { uiId: string }, pageParams: any): void;
         /**
          * @desc 跳转到 app 内置路由页面或网页
-         * @param routeId app 路由 url 或网页链接
+         * @param {String} url - 设置网页url跳转功能，可跳转商城，官网。若短链已配置参数，则需添加参数，例如 `${url}?homeId=123456`
          */
-        jumpTo(routeId: string): void;
+        jumpTo(url: string): void;
+        /**
+         * @desc 获取客户端信息，比如 app 的版本信息，时区等
+         */
         mobileInfo: MobileInfo;
         shareMsg(map: any): void;
+        /**
+         * @desc 编辑对话框
+         * @param {String} title - 标题
+         * @param {String} editString - 编辑信息内容
+         * @param {Function} onConfirmed - 确认函数
+         * @param {Function} onCanceled - 取消函数
+         */
         showEditDialog(
             title: string,
             editString: string,
@@ -2216,9 +2303,19 @@ export let TYSdk: {
             onCanceled: () => void,
         ): void;
         /**
-         * 显示 app 原生 loading UI 框
+         * @desc 显示 app 原生 loading UI 框
          */
         showLoading(): void;
+        /**
+         * @desc 轻量级对话
+         * @param {String} confirmText - 确认文本
+         * @param {String} cancelText - 取消文本
+         * @param {String} title - 对话框标题
+         * @param {String} message - 文本
+         * @param {String} defaultValue - 默认值
+         * @param {Function} onConfirmed - 确认函数
+         * @param {Function} onCanceled - 取消函数
+         */
         showPromptDialog(
             confirmText: string,
             cancelText: string,
@@ -2228,8 +2325,24 @@ export let TYSdk: {
             onConfirmed: (value: string) => void,
             onCanceled: () => void,
         ): void;
+        /**
+         * @desc 简易确认对话框
+         * @param {String} title - 标题
+         * @param {String} msg - 对话框信息
+         * @param {Function} onConfirmed - 确认函数
+         * @param {Function} onCanceled - 取消函数
+         */
         simpleConfirmDialog(title: string, subTitle: string, confirm: () => void, cancel: () => void): void;
+        /**
+         * @desc 简易提示框
+         * @param {String} msg - 对话框信息
+         * @param {Function} onConfirmed - 确认函数
+         */
         simpleTipDialog(title: string, callback: () => void): void;
+        /**
+         * @desc 是否支持该 app 版本
+         * @returns {Boolean}
+         */
         verSupported(): boolean;
     };
 
@@ -2276,6 +2389,14 @@ export let TYSdk: {
         goToAlarmListActivity: AnyFunction;
         gotoBlePermissions: AnyFunction;
         gotoDeviceWifiNetworkMonitor: AnyFunction;
+        /**
+         * @desc 跳转到云定时页面
+         * @param {String} category - 定时类型
+         * @param {String | Number} dpId - 获取定时的 dp 点
+         * @param {String} dpName - dp 点显示的名字
+         * @param {Array} rangeKeys - dp 点的值范围
+         * @param {Array} rangeValues - dp 点的显示数据范围(rangeKeys 对应的文本信息)
+         */
         gotoDpAlarm: (param: { category: string; repeat: number; data: GotoDpAlarmData }) => void;
         hideLoading: AnyFunction;
         is24Hour: AnyFunction;
@@ -2301,6 +2422,9 @@ export let TYSdk: {
         setDevProperty: AnyFunction;
         shareMsg: AnyFunction;
         shareToSystem: AnyFunction;
+        /**
+         * @desc 跳转设备详情页
+         */
         showDeviceMenu: AnyFunction;
         showEditDialog: AnyFunction;
         showLoading: AnyFunction;
